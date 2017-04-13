@@ -1,38 +1,45 @@
+# dataflow
+
+Toy example of setting up a delayed-execution graph, or ["dataflow"](https://www.tensorflow.org/versions/r0.11/resources/faq) in [TensorFlow](https://www.tensorflow.org/) terminology.
+
+Check out the [stackoverflow question that inspired this demo](http://stackoverflow.com/a/43380155/1490091).
+
 # usage
 
+Use the `@dataflow` decorator to wrap a function with dataflow capabilities:
+
 ```python
-from dataflow import dataflow
-
 @dataflow
-def f(g, seed):
-    return g**2 % seed
-
-@dataflow
-def g(a, b, h):
-    return a * b + h
-
-@dataflow
-def h(c, d):
-    return c / d
-
-seed = 5
-
-# setting up the execution / dataflow
-graph = f(g(1, 2, h(3, 4)), seed)
-
-# no addition or multiplication has happened yet
-
-# executing the dataflow
-print(graph.execute())
+def f(x, y):
+    return x**2 % y
 ```
 
-Note the use of the `@dataflow` decorator. If you want you could also define the functions regularly and later convert them into `DataflowFunctions`:
+Compose many `@dataflow` functions into a graph:
 
 ```python
-def f(g, seed):
-    return g**2 % seed
+graph = f(g(1, 2, h(3, 4)), 5)
+```
 
-# do stuff with regular, non-dataflow f
+Execute the function:
 
-f = dataflow(f) # now f is a DataflowFunction
+```python
+answer = graph.execute()
+```
+
+## variables
+
+You can also define variables that get bound to values at execution time:
+
+```python
+z = Variable()
+seed = Variable()
+
+graph = f(g(z, 2, h(4, z)), seed)
+```
+
+You can execute the same graph with different values bound to the variables:
+
+```python
+answer1 = graph.execute({z: 1., seed: 5})
+answer2 = graph.execute({z: 3., seed: 13})
 ```
