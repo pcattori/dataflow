@@ -13,12 +13,12 @@ def h(i, j):
     return i / j
 
 z = Variable()
-seed = Variable()
+seed = df.Variable()
 
-# setting up the execution / dataflow
+# setting up the dataflow graph
 graph = f(g(z, 2, h(4, z)), seed)
-# no addition or multiplication has happened yet
+# bodies of f,g,h functions have not executed yet
 
-# executing the dataflow
+# executing the dataflow graph
 print(graph.execute({z: 1., seed: 5}))
 print(graph.execute({z: 3., seed: 13}))
